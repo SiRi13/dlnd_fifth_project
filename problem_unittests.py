@@ -73,7 +73,7 @@ def test_discriminator(discriminator, tf_module):
     with TmpMock(tf_module, 'variable_scope') as mock_variable_scope:
         image = tf.placeholder(tf.float32, [None, 28, 28, 3])
 
-        output, logits = discriminator(image)
+        output, logits = discriminator(image, 0.1)
         _assert_tensor_shape(output, [None, 1], 'Discriminator Training(reuse=false) output')
         _assert_tensor_shape(logits, [None, 1], 'Discriminator Training(reuse=false) Logits')
         assert mock_variable_scope.called,\
@@ -83,7 +83,7 @@ def test_discriminator(discriminator, tf_module):
 
         mock_variable_scope.reset_mock()
 
-        output_reuse, logits_reuse = discriminator(image, True)
+        output_reuse, logits_reuse = discriminator(image, 0.1, True)
         _assert_tensor_shape(output_reuse, [None, 1], 'Discriminator Inference(reuse=True) output')
         _assert_tensor_shape(logits_reuse, [None, 1], 'Discriminator Inference(reuse=True) Logits')
         assert mock_variable_scope.called, \
@@ -98,7 +98,7 @@ def test_generator(generator, tf_module):
         z = tf.placeholder(tf.float32, [None, 100])
         out_channel_dim = 5
 
-        output = generator(z, out_channel_dim)
+        output = generator(z, out_channel_dim, 0.1)
         _assert_tensor_shape(output, [None, 28, 28, out_channel_dim], 'Generator output (is_train=True)')
         assert mock_variable_scope.called, \
             'tf.variable_scope not called in Generator Training(reuse=false)'
@@ -106,7 +106,7 @@ def test_generator(generator, tf_module):
             'tf.variable_scope called with wrong arguments in Generator Training(reuse=false)'
 
         mock_variable_scope.reset_mock()
-        output = generator(z, out_channel_dim, False)
+        output = generator(z, out_channel_dim, 0.1, False)
         _assert_tensor_shape(output, [None, 28, 28, out_channel_dim], 'Generator output (is_train=False)')
         assert mock_variable_scope.called, \
             'tf.variable_scope not called in Generator Inference(reuse=True)'
@@ -120,7 +120,7 @@ def test_model_loss(model_loss):
     input_real = tf.placeholder(tf.float32, [None, 28, 28, out_channel_dim])
     input_z = tf.placeholder(tf.float32, [None, 100])
 
-    d_loss, g_loss = model_loss(input_real, input_z, out_channel_dim)
+    d_loss, g_loss = model_loss(input_real, input_z, out_channel_dim, 0.1)
 
     _assert_tensor_shape(d_loss, [], 'Discriminator Loss')
     _assert_tensor_shape(d_loss, [], 'Generator Loss')
