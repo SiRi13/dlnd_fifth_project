@@ -144,6 +144,6 @@ def test_model_opt(model_opt, tf_module):
         learning_rate = 0.001
         beta1 = 0.9
 
-        d_train_opt, g_train_opt, _ = model_opt(d_loss, g_loss, learning_rate, beta1)
+        d_train_opt, g_train_opt = model_opt(d_loss, g_loss, learning_rate, beta1)
         assert mock_trainable_variables.called,\
             'tf.mock_trainable_variables not called'
